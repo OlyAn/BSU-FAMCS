@@ -1,0 +1,43 @@
+{
+  "name": "electron-react-webpack",
+  "version": "1.0.0",
+  "description": "Electron + React + Webpack 2 seed.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "webpack",
+    "serve": "electron .",
+    "start": "npm-run-all --parallel dev serve"
+  },
+  "author": "J. Renato Ramos González <renato.etc.etc.etc@gmail.com>",
+  "repository": "pastahito/electron-react-webpack",
+  "license": "WTFPL",
+  "devDependencies": {
+    "babel-core": "^6.23.1",
+    "babel-eslint": "^8.2.2",
+    "babel-loader": "^6.3.2",
+    "babel-preset-react": "^6.23.0",
+    "css-loader": "^0.26.1",
+    "extract-text-webpack-plugin": "^2.0.0-rc.3",
+    "file-loader": "^1.1.11",
+    "node-sass": "^4.7.2",
+    "npm-run-all": "^4.1.2",
+    "sass-loader": "^6.0.7",
+    "ttf-loader": "^1.0.2",
+    "webpack": "^2.2.1"
+  },
+  "dependencies": {
+    "electron": "^1.4.15",
+    "electron-devtools-installer": "^2.2.3",
+    "electron-reload": "^1.1.0",
+    "eslint": "^4.18.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jsx": "0.0.2",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "react": "^15",
+    "react-dom": "^15",
+    "uikit": "^3.0.0-beta.40",
+    "webpack-sass-loaders": "^1.0.0"
+  }
+}

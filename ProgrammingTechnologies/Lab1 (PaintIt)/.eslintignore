@@ -1,0 +1,4 @@
+webpack.config.js
+app/build/*
+app/src/entry.js
+app/src/canvas.js
