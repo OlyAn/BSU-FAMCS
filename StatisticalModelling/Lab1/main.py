@@ -48,6 +48,7 @@ for λ in LAMBDAS:
     plt.hist(poissons, density=True)
     plt.title(f'Poisson distribution. λ = {λ}')
     plt.savefig(f'plots/poisson_{λ}')
+    plt.show()
     poissons_means.append(mean(poissons))
     poissons_std.append(std(poissons)**2)
 
@@ -56,6 +57,7 @@ for λ in LAMBDAS:
     plt.hist(normals, density=True)
     plt.title(f'Normal distribution. μ = {λ}, σ^2 = {round(sqrt(λ), 3)}')
     plt.savefig(f'plots/normal_{λ}')
+    plt.show()
     normals_means.append(round(mean(normals), 2))
     normals_std.append(round(std(normals), 2)**2)
 
