@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from math import sqrt, exp
 from numpy import mean, std
 from scipy.stats import norm
-from linear_congruential_generator import *
+from utils import *
 
 
 LAMBDAS = [6, 9, 12, 15, 18]
