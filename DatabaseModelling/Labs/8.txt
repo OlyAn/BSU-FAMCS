@@ -1,0 +1,91 @@
+--Лабораторная выполняется в СУБД  Oracle. 
+--Cкопируйте файл  FPMI-stud\SUBFACULTY\каф ИСУ\Исаченко\Лаб2018\Edu8.sql  в каталог C:\TEMP .
+--Раскройте файл и ознакомтесь со скриптом создания и заполнения таблиц для выполнения лабораторной. 
+--Запустите скрипт edu7.sql на выполнение.
+--Вставте в эту строку Ваши ФИО, номер группы, курса. ФИО Анейчик Ольга Владимировна, группа 2, курс 4.      
+--Файл с отчётом о выполнении лабораторной создаётся путём вставки скриптов, созданных 
+--Вами операторов после пунктов 1- 9.
+--Файл отчёта именуется фамилией студента  в английской транскрипции, с расширением .txt 
+--и сохраняется в каталог  fpmi-serv604\comman_stud\исаченко\Лаб\группа_.
+
+--1.	Создайте таблицу emp_tel, с полями empno, phone_num. Первое из них - поле идентичное полю empno 
+--таблицы emp и служит внешним ключом для связывания таблиц emp и emp_tel. 
+--Второе поле – массив переменной длины с максимальным числом элементов равным четырём. 
+--Поле может содержать телефоны сотрудника (рабочий, МТС, Велком, Лайф). 
+
+CREATE OR REPLACE TYPE PHONES_ARRAY IS VARRAY(4) OF VARCHAR(11);
+/
+CREATE TABLE emp_tel(empno INTEGER NOT NULL REFERENCES emp(empno), phone_num PHONES_ARRAY);
+
+--2.	Вставьте записи в таблицу  emp_tel со следующими данными:
+--505, 2203415, 80297121314, 80296662332, Null
+--303, 2240070, 80297744543, 80296667766, 80443345543
+--503, 2233014, Null, 80296171717, 80443161612
+--104, 22333015, 80297654321, Null, 90443939398
+
+INSERT INTO emp_tel VALUES(505, PHONES_ARRAY('2203415', '80297121314', '80296662332', NULL));
+INSERT INTO emp_tel VALUES(303, PHONES_ARRAY('2240070', '80297744543', '80296667766', '80443345543'));
+INSERT INTO emp_tel VALUES(503, PHONES_ARRAY('2233014', NULL, '80296171717', '80443161612'));
+INSERT INTO emp_tel VALUES(104, PHONES_ARRAY('22333015', '80297654321', NULL, '90443939398'));
+
+
+--3.	Создайте запросы:
+--a)	 для сотрудников с номерами 104, 303 указать имена и номера телефонов;
+SELECT emp.empname, emp_tel.phone_num FROM emp_tel JOIN emp ON emp.empno = emp_tel.empno WHERE emp.empno IN (104, 303);
+
+--b)	для сотрудника с номером 505, используя функцию Table, укажите его номер и телефоны.
+SELECT emp_tel.empno, COLUMN_VALUE FROM emp_tel, TABLE(phone_num) WHERE emp_tel.empno = 505;
+
+--4.	Создайте таблицу children с полями empno, child. 
+--Первое из них - поле идентичное полю empno таблицы emp и служит внешним ключом для связывания 
+--таблиц emp и children. Второе является вложенной таблицей и содержит данные об имени (name) 
+--и дате рождения ребёнка (birthdate) сотрудника.
+
+CREATE OR REPLACE TYPE child_info AS OBJECT(
+  name VARCHAR(20),
+  birthdate DATE);
+/
+CREATE TYPE CHILD_TABLE IS TABLE OF child_info;
+/
+CREATE TABLE children(
+  empno INTEGER NOT NULL REFERENCES emp(empno),
+  child CHILD_TABLE) NESTED TABLE child STORE AS child_info_table;
+
+
+--5.	Вставьте в таблицу children записи:
+--для сотрудника с номером 102 двое детей: Jack, 02.02.2000
+--				               Mari, 10.11.2004;
+INSERT INTO children VALUES(102,
+    child_table(
+        child_info('Jack', TO_DATE('02.02.2000','DD.MM.YYYY')),
+        child_info('Mari', TO_DATE('10.11.2004','DD.MM.YYYY'))
+    )
+);
+
+--для сотрудника с номером 327 двое детей: Alex, 22.09.2005
+--						Janis, 04.10.2008.
+INSERT INTO children VALUES(327,
+    child_table(
+        child_info('Alex', TO_DATE('22.09.2005','DD.MM.YYYY')),
+        child_info('Janis', TO_DATE('04.10.2008','DD.MM.YYYY'))
+    )
+);
+
+--6.	Создайте запросы:
+--a)	укажите все сведения из таблицы children;
+SELECT childinfo.empno, childtable.* FROM children childinfo, TABLE(childinfo.child) childtable;
+
+--b)	укажите номер сотрудника, имеющего ребёнка с именем Janis, имя ребёнка и дату рождения ребёнка.
+SELECT childinfo.empno, childtable.* FROM children childinfo, TABLE(childinfo.child) childtable WHERE name = 'Janis';
+
+--7.	Измените дату рождения ребёнка с именем Alex на 10.10.2006.
+UPDATE TABLE (
+    SELECT child FROM children, TABLE(child) childtable WHERE childtable.name = 'Alex'
+) SET birthdate = TO_DATE('10.10.2006','DD.MM.YYYY') WHERE name = 'Alex';
+
+--8.	Добавьте для сотрудника с номером 102 ребёнка с именем Julio и датой рождения 01.12.2010.
+INSERT INTO TABLE (SELECT child FROM children WHERE empno = 102) VALUES (child_info('Julio', TO_DATE('01.12.2010','DD.MM.YYYY')));
+
+--9.	Удалите сведения о ребёнке с именем Mari для сотрудника с номером 102.
+DELETE FROM TABLE (SELECT child FROM children WHERE empno = 102) childinfo WHERE childinfo.name = 'Mari';	
+	
